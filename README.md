@@ -1,14 +1,14 @@
-# Utilização do SQL Server em aplicações em .Net Core
+# Utilização do PostGres em aplicações em .Net Core
 
-Adapter para conexão com o SQL Server  
+Adapter para conexão com o PostGres  
 
 ## Intalação via Nuget
-PM > Install-Package Marraia.SqlServer
+PM > Install-Package Marraia.Postgres
 
 
 ## Arquivo de configuração - String de conexão
 
-Primeiro passo é adicionar a string de conexão de seu banco de dados SQL Server em seu arquivo de configuração **appsettings.json**
+Primeiro passo é adicionar a string de conexão de seu banco de dados Postgres em seu arquivo de configuração **appsettings.json**
 
 ```
 "Connection": "Data Source=localhost;Initial Catalog=TesteDb;User Id=sa;Password=123Aa321;"
@@ -25,14 +25,14 @@ No arquivo Startup.cs de sua aplicação adicione no método **ConfigureServices
         {
             ..
             ..
-            services.AddDapperSqlServer(Configuration.GetSection("Connection").Value);
+            services.AddDapperPostgres(Configuration.GetSection("Connection").Value);
         }
 ```
   
 ## Herança de Interface de Repositório Base
 Na interface de repositório de sua classe de domínio, precisaremos da herança da interface **IRepositoryBase<ClassDomain, PrimaryKey>**
 Onde **ClassDomain** informe sua classe de domínio
-Onde **PrimaryKey** informe o tipo da identificação do objeto no SQL Server
+Onde **PrimaryKey** informe o tipo da identificação do objeto no Postgres
 
 ````
     public interface IPersonRepository : IRepositoryBase<Person, int>
@@ -43,7 +43,7 @@ Onde **PrimaryKey** informe o tipo da identificação do objeto no SQL Server
 ## Herança de Repositório Base
 Em seu repositório use a herança da classe **RepositoryBase<ClassDomain, PrimaryKey>**.
 Onde **ClassDomain** informe sua classe de domínio
-Onde **PrimaryKey** informe o tipo da identificação do objeto no SQL Server
+Onde **PrimaryKey** informe o tipo da identificação do objeto no Postgres
 
 ````
 public class PersonRepository : RepositoryBase<Person, int>, IPersonRepository
@@ -90,7 +90,7 @@ Caso necessite você poderá fazer a sobrescrita dos métodos da classe base **R
         }
     }
 ```
-Perceba, que para obter a conexão com o SQL SERVER, existe a propriedade **_connection**, que já está injetada com a sua classe de domínio.
+Perceba, que para obter a conexão com o Postgres, existe a propriedade **_connection**, que já está injetada com a sua classe de domínio.
 
 ## Transação com Dapper
 Caso você precise controlar transação em seu projeto, segue um exemplo da utilização com o design de Unit of Work.
