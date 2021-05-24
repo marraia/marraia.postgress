@@ -49,7 +49,7 @@ namespace Marraia.Postgres.Comum
             properties.ForEach(property =>
             {
                 if (!property.Equals("Id"))
-                    query.Append($"[{property}],");
+                    query.Append($"{property},");
             });
 
             query
