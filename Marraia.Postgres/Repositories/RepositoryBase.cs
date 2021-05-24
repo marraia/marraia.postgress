@@ -1,26 +1,20 @@
 ﻿using Dapper;
+using Marraia.Postgres.Comum;
 using Marraia.Postgres.Repositories.Interfaces;
 using Marraia.Postgres.Uow.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Marraia.Postgres.Repositories
 {
-    public abstract class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey>, IDisposable
+    public abstract class RepositoryBase<TEntity, TKey> : CommonConfiguration<TEntity>, IRepositoryBase<TEntity, TKey>, IDisposable
                 where TEntity : class
                 where TKey : struct
     {
-        private const int RemoveCaracteres = 1;
-
         protected readonly IDbConnection _connection;
         private readonly ITransactionBase _transactionBase;
-        private IEnumerable<PropertyInfo> GetProperties => typeof(TEntity).GetProperties();
 
         protected RepositoryBase(IDbConnection connection,
                                         ITransactionBase transactionBase)
@@ -31,15 +25,16 @@ namespace Marraia.Postgres.Repositories
             _transactionBase = transactionBase;
         }
 
-        public virtual async Task InsertAsync(TEntity entity)
+        public virtual async Task<TKey> InsertAsync(TEntity entity)
         {
             var query = GenerateInsertQuery();
 
-            await _connection
-                    .ExecuteAsync(query,
-                                  entity,
-                                  transaction: _transactionBase.GetDbTransaction())
-                    .ConfigureAwait(false);
+            var id = await _connection
+                            .ExecuteScalarAsync<TKey>(query,
+                                            entity,
+                                            transaction: _transactionBase.GetDbTransaction())
+                            .ConfigureAwait(false);
+            return id;
         }
 
         public virtual async Task UpdateAsync(TEntity entity)
@@ -85,63 +80,6 @@ namespace Marraia.Postgres.Repositories
 
             _connection
                 .Dispose();
-        }
-
-        protected string GenerateUpdateQuery()
-        {
-            var query = new StringBuilder($"UPDATE {typeof(TEntity).Name} SET ");
-            var properties = GetPropertiesByEntity(GetProperties);
-
-            properties.ForEach(property =>
-            {
-                if (!property.Equals("Id"))
-                {
-                    query.Append($"{property}=@{property},");
-                }
-            });
-
-            query.Remove(query.Length - RemoveCaracteres, RemoveCaracteres);
-            query.Append(" WHERE Id=@Id");
-
-            return query.ToString();
-        }
-
-        private string GenerateInsertQuery()
-        {
-            var query = new StringBuilder($"INSERT INTO {typeof(TEntity).Name} ");
-            query.Append("(");
-
-            var properties = GetPropertiesByEntity(GetProperties);
-
-            properties.ForEach(property =>
-            {
-                if (!property.Equals("Id"))
-                    query.Append($"[{property}],");
-            });
-
-            query
-                .Remove(query.Length - RemoveCaracteres, RemoveCaracteres)
-                .Append(") VALUES (");
-
-            properties.ForEach(property =>
-            {
-                if (!property.Equals("Id"))
-                    query.Append($"@{property},");
-            });
-
-            query
-                .Remove(query.Length - RemoveCaracteres, RemoveCaracteres)
-                .Append(")");
-
-            return query.ToString();
-        }
-
-        private static List<string> GetPropertiesByEntity(IEnumerable<PropertyInfo> properties)
-        {
-            return (from property in properties
-                    let attributes = property.GetCustomAttributes(typeof(DescriptionAttribute), false)
-                    where attributes.Length <= 0
-                    select property.Name).ToList();
         }
     }
 }

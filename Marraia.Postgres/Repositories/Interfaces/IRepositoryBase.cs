@@ -8,7 +8,7 @@ namespace Marraia.Postgres.Repositories.Interfaces
         where TEntity : class
         where TKey : struct
     {
-        Task InsertAsync(TEntity entity);
+        Task<TKey> InsertAsync(TEntity entity);
         Task UpdateAsync(TEntity entity);
         Task DeleteAsync(TKey id);
         Task<TEntity> GetByIdAsync(TKey id);
