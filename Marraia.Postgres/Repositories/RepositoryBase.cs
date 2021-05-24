@@ -2,6 +2,7 @@
 using Marraia.Postgres.Comum;
 using Marraia.Postgres.Repositories.Interfaces;
 using Marraia.Postgres.Uow.Interfaces;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -17,7 +18,9 @@ namespace Marraia.Postgres.Repositories
         private readonly ITransactionBase _transactionBase;
 
         protected RepositoryBase(IDbConnection connection,
-                                        ITransactionBase transactionBase)
+                                   ITransactionBase transactionBase,
+                                   IConfiguration configuration)
+            : base(configuration)
         {
             _connection = connection;
             _connection.Open();
