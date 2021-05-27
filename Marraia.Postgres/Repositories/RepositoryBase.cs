@@ -52,22 +52,28 @@ namespace Marraia.Postgres.Repositories
         }
         public virtual async Task DeleteAsync(TKey id)
         {
+            var sql = GenerateDeleteQuery();
+
             await _connection
-                    .ExecuteAsync($"DELETE FROM {typeof(TEntity).Name} WHERE Id=@Id",
+                    .ExecuteAsync(sql,
                                     new { Id = id },
                                     transaction: _transactionBase.GetDbTransaction())
                     .ConfigureAwait(false);
         }
         public virtual async Task<TEntity> GetByIdAsync(TKey id)
         {
+            var sql = GenerateSelectByIdQuery();
+
             return await _connection
-                            .QuerySingleOrDefaultAsync<TEntity>($"SELECT * FROM {typeof(TEntity).Name} WHERE Id=@Id", new { Id = id })
+                            .QuerySingleOrDefaultAsync<TEntity>(sql, new { Id = id })
                             .ConfigureAwait(false);
         }
         public virtual async Task<IEnumerable<TEntity>> GetAllAsync()
         {
+            var sql = GenerateSelectAllQuery();
+
             return await _connection
-                            .QueryAsync<TEntity>($"SELECT * FROM {typeof(TEntity).Name}")
+                            .QueryAsync<TEntity>(sql)
                             .ConfigureAwait(false);
         }
         public void Dispose()

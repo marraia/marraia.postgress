@@ -89,14 +89,14 @@ namespace Marraia.Postgres.Comum
 
         public string GenerateSelectByIdQuery()
         {
-            var sql = $"SELECT * FROM {Schema}.{NameTable} WHERE ID=@Id";
+            var sql = $"SELECT * FROM {Schema}.{NameTable} WHERE Id=@Id";
 
             return sql;
         }
 
         public string GenerateDeleteQuery()
         {
-            var sql = $"DELETE FROM {Schema}.{NameTable} WHERE ID=@Id";
+            var sql = $"DELETE FROM {Schema}.{NameTable} WHERE Id=@Id";
 
             return sql;
         }
