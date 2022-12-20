@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Marraia.Postgres.Comum;
+using Marraia.Postgres.Core;
 using Marraia.Postgres.Repositories.Interfaces;
 using Marraia.Postgres.Uow.Interfaces;
 using Microsoft.Extensions.Configuration;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 namespace Marraia.Postgres.Repositories
 {
     public abstract class RepositoryBase<TEntity, TKey> : CommonConfiguration<TEntity>, IRepositoryBase<TEntity, TKey>, IDisposable
-                where TEntity : class
+                where TEntity : Entity<TKey>
                 where TKey : struct
     {
         protected readonly IDbConnection _connection;

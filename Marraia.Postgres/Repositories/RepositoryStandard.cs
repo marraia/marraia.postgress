@@ -1,4 +1,5 @@
 ﻿using Marraia.Postgres.Comum;
+using Marraia.Postgres.Core;
 using Marraia.Postgres.Uow.Interfaces;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -7,7 +8,7 @@ using System.Data;
 namespace Marraia.Postgres.Repositories
 {
     public class RepositoryStandard<TEntity, TKey> : CommonConfiguration<TEntity>, IDisposable
-            where TEntity : class
+            where TEntity : Entity<TKey>
             where TKey : struct
     {
         protected readonly IDbConnection _connection;
