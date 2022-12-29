@@ -54,7 +54,7 @@ namespace Marraia.Postgres.Comum
 
             properties.ForEach(property =>
             {
-                if (!property.Equals("Id"))
+                if (HasPropertyCommand(property, GetProperties))
                 {
                     if (!IsIgnore(property))
                     {
@@ -141,6 +141,28 @@ namespace Marraia.Postgres.Comum
                     let attributes = property.GetCustomAttributes(typeof(DescriptionAttribute), false)
                     where attributes.Length <= 0
                     select property.Name).ToList();
+        }
+
+        private bool HasPropertyCommand(string propertyItem, IEnumerable<PropertyInfo> properties)
+        {
+            var hasCommand = true;
+
+            if (propertyItem == "Id")
+            {
+                var property = properties
+                                .Where(prop => prop.Name == propertyItem)
+                                .FirstOrDefault();
+
+                if (property != null)
+                {
+                    if (property.PropertyType == typeof(Guid))
+                        hasCommand = true;
+                    else
+                        hasCommand = false;
+                }
+            }
+
+            return hasCommand;
         }
     }
 }
