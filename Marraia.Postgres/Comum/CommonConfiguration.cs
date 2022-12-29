@@ -69,7 +69,7 @@ namespace Marraia.Postgres.Comum
 
             properties.ForEach(property =>
             {
-                if (!property.Equals("Id"))
+                if (HasPropertyCommand(property, GetProperties))
                 {
                     if (!IsIgnore(property))
                     {
