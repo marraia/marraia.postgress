@@ -24,7 +24,11 @@ namespace Marraia.Postgres.Repositories
             : base(configuration)
         {
             _connection = connection;
-            _connection.Open();
+
+            if (_connection.State == ConnectionState.Closed)
+            {
+                _connection.Open();
+            }
 
             _transactionBase = transactionBase;
         }
