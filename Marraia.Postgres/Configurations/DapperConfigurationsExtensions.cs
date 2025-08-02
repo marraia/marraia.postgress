@@ -1,19 +1,17 @@
-﻿using Marraia.Postgres.Uow;
+﻿using Marraia.Postgres.Repositories.Interfaces;
 using Marraia.Postgres.Uow.Interfaces;
-using Marraia.Postgres.Uow.Transactions;
 using Microsoft.Extensions.DependencyInjection;
-using Npgsql;
-using System.Data;
 
 namespace Marraia.Postgres.Configurations
 {
+    public interface IPostgresTransactionBase : ITransactionBase { }
     public static class DapperConfigurationsExtensions
     {
-        public static IServiceCollection AddDapperPostgres(this IServiceCollection service, string connectionString)
+        public static IServiceCollection AddPostgres(this IServiceCollection service, string connectionString)
         {
-            service.AddScoped<IDbConnection>(db => new NpgsqlConnection(connectionString));
-            service.AddScoped<IUnitOfWork, UnitOfWork>();
-            service.AddScoped<ITransactionBase, TransactionBase>();
+            service.AddScoped<IPostgresDbConnection>(db => new PostgresDbConnection(connectionString));
+            service.AddScoped<IPostgresUnitOfWork, PostgresUnitOfWork>();
+            service.AddScoped<IPostgresTransactionBase, PostgresTransactionBase>();
 
             return service;
         }

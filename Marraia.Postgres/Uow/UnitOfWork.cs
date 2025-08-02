@@ -1,17 +1,18 @@
-﻿using Marraia.Postgres.Uow.Interfaces;
+﻿using Marraia.Postgres.Repositories.Interfaces;
+using Marraia.Postgres.Uow.Interfaces;
 using System;
 using System.Data;
 
 namespace Marraia.Postgres.Uow
 {
-    public class UnitOfWork : IUnitOfWork, IDisposable
+    public class UnitOfWork : IPostgresUnitOfWork, IDisposable
     {
-        private readonly IDbConnection _connection;
+        private readonly IPostgresDbConnection _connection;
         readonly ITransactionBase _transactionBase;
         private IDbTransaction DbTransaction { get; set; }
 
-        public UnitOfWork(IDbConnection connection,
-                                 ITransactionBase transactionBase)
+        public UnitOfWork(IPostgresDbConnection connection,
+                          ITransactionBase transactionBase)
         {
             _connection = connection;
             _transactionBase = transactionBase;
