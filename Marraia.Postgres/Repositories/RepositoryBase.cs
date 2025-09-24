@@ -15,11 +15,11 @@ namespace Marraia.Postgres.Repositories
                 where TEntity : Entity<TKey>
                 where TKey : struct
     {
-        protected readonly IDbConnection _connection;
-        private readonly ITransactionBase _transactionBase;
+        protected readonly IPostgresDbConnection _connection;
+        private readonly IPostgresTransactionBase _transactionBase;
 
-        protected RepositoryBase(IDbConnection connection,
-                                   ITransactionBase transactionBase,
+        protected RepositoryBase(IPostgresDbConnection connection,
+                                   IPostgresTransactionBase transactionBase,
                                    IConfiguration configuration)
             : base(configuration)
         {

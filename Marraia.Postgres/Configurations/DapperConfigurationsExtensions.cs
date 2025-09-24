@@ -1,10 +1,8 @@
 ﻿using Marraia.Postgres.Repositories.Interfaces;
-using Marraia.Postgres.Uow.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Marraia.Postgres.Configurations
 {
-    public interface IPostgresTransactionBase : ITransactionBase { }
     public static class DapperConfigurationsExtensions
     {
         public static IServiceCollection AddPostgres(this IServiceCollection service, string connectionString)
