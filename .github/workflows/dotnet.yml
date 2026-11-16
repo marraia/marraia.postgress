@@ -1,29 +1,47 @@
-name: .NET Core
+name: .NET
 
 on:
   push:
     branches: [ main ]
+    tags: [ 'v*' ]
   pull_request:
     branches: [ main ]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 9.0.x
-    - name: Install dependencies
+        dotnet-version: |
+          8.0.x
+          9.0.x
+          10.0.x
+
+    - name: Restore
       run: dotnet restore
+
     - name: Build
       run: dotnet build --configuration Release --no-restore
+
+    # Os testes de integração usam Testcontainers (Docker já disponível no runner ubuntu).
     - name: Test
-      run: dotnet test --no-restore --verbosity normal
-    - name: Generate a NuGet package
-      run: dotnet pack --no-build -c Release -o .
-    - name: Push to GitHub package registry
-      run: dotnet nuget push *.nupkg -k ${{ secrets.KEY_NUGET }} -s https://api.nuget.org/v3/index.json
+      run: dotnet test --configuration Release --no-build --verbosity normal
+
+    - name: Pack
+      run: dotnet pack Marraia.Postgres/Marraia.Postgres.csproj --configuration Release --no-build -o ./artifacts
+
+    - name: Upload package
+      uses: actions/upload-artifact@v4
+      with:
+        name: nuget
+        path: ./artifacts/*.nupkg
+
+    # Publica no nuget.org somente ao criar uma tag v* (nunca em pull requests).
+    - name: Push to nuget.org
+      if: startsWith(github.ref, 'refs/tags/v')
+      run: dotnet nuget push ./artifacts/*.nupkg -k ${{ secrets.KEY_NUGET }} -s https://api.nuget.org/v3/index.json --skip-duplicate

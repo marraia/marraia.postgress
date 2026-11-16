@@ -5,8 +5,8 @@ namespace Marraia.Postgres.Configurations
 {
     public class PostgresUnitOfWork : UnitOfWork, IPostgresUnitOfWork
     {
-        public PostgresUnitOfWork(IPostgresDbConnection connection, 
-                                  IPostgresTransactionBase transactionBase) 
-        : base(connection, transactionBase) {}
+        public PostgresUnitOfWork(IPostgresConnectionFactory connectionFactory,
+                                  IPostgresTransactionBase transactionBase)
+            : base(connectionFactory, transactionBase) { }
     }
 }

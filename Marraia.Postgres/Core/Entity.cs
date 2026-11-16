@@ -4,12 +4,12 @@
     {
         public T Id { get; protected set; }
 
-        public static bool operator !=(Entity<T> a, Entity<T> b)
+        public static bool operator !=(Entity<T>? a, Entity<T>? b)
         {
             return !(a == b);
         }
 
-        public static bool operator ==(Entity<T> a, Entity<T> b)
+        public static bool operator ==(Entity<T>? a, Entity<T>? b)
         {
             if (ReferenceEquals(a, null) && ReferenceEquals(b, null))
                 return true;
@@ -19,13 +19,15 @@
             return a.Equals(b);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
-            var compareTo = obj as Entity<T>;
-
-            if (ReferenceEquals(this, compareTo))
+            if (ReferenceEquals(this, obj))
                 return true;
-            if (ReferenceEquals(null, compareTo))
+            if (!(obj is Entity<T> compareTo) || compareTo.GetType() != GetType())
+                return false;
+
+            // Entidades ainda não persistidas (Id padrão) só são iguais a si mesmas.
+            if (Id.Equals(default(T)) || compareTo.Id.Equals(default(T)))
                 return false;
 
             return Id.Equals(compareTo.Id);

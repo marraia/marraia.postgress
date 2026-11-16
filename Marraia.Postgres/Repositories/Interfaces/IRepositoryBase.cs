@@ -1,17 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Marraia.Postgres.Repositories.Interfaces
 {
-    public interface IRepositoryBase<TEntity, TKey> : IDisposable
+    public interface IRepositoryBase<TEntity, TKey>
         where TEntity : class
         where TKey : struct
     {
         Task<TKey> InsertAsync(TEntity entity);
         Task UpdateAsync(TEntity entity);
         Task DeleteAsync(TKey id);
-        Task<TEntity> GetByIdAsync(TKey id);
+        Task<TEntity?> GetByIdAsync(TKey id);
         Task<IEnumerable<TEntity>> GetAllAsync();
     }
 }

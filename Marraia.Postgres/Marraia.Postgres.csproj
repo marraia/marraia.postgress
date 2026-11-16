@@ -1,22 +1,45 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
     <Authors>Fernando Mendes</Authors>
-    <Description>Biblioteca para auxiliar sua conexão com o Postgres em seus projetos, de forma fácil e simples!</Description>
+    <Description>Biblioteca para auxiliar sua conexão com o Postgres em seus projetos, de forma fácil e simples! Usa conexão por operação (NpgsqlDataSource + pool), leitura/escrita separadas (réplica), Unit of Work com rollback automático e serialização segura de operações paralelas dentro de uma transação.</Description>
     <PackageIcon>marraia.png</PackageIcon>
-    <AssemblyVersion>2.0.0.2</AssemblyVersion>
-    <FileVersion>2.0.0.2-alpha</FileVersion>
-    <Version>2.0.2-alpha</Version>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>Postgres;PostgreSQL;Npgsql;Dapper;Repository;UnitOfWork;DataAccess</PackageTags>
+    <AssemblyVersion>3.0.0.0</AssemblyVersion>
+    <FileVersion>3.0.0.0</FileVersion>
+    <Version>3.0.0</Version>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/marraia/marraia.Postgres</PackageProjectUrl>
+    <PackageReleaseNotes>
+      v3.0.0 (BREAKING):
+      • Conexão por operação via IPostgresConnectionFactory (NpgsqlDataSource singleton + pool), substituindo a conexão Scoped aberta no construtor.
+      • Leitura e escrita segregadas (opcional, por repositório): AddPostgres(connectionStringRead, connectionStringWrite) + construtor com IPostgresReadConnectionFactory/IPostgresWriteConnectionFactory; ExecuteReadAsync vai para a réplica e ExecuteWriteAsync para o primário. Repositórios no modo padrão (IPostgresConnectionFactory + ExecuteSafeAsync) seguem sem alteração.
+      • UnitOfWork abre a própria conexão, a compartilha com os repositórios durante a transação e a devolve ao pool no Commit/Rollback/Dispose (rollback automático se não houver commit).
+      • Operações paralelas (Task.WhenAll) dentro de uma transação são serializadas por SemaphoreSlim (reentrante) no ITransactionBase.
+      • API async: BeginTransactionAsync, CommitAsync, RollbackAsync, DisposeAsync.
+      • Uso direto com _connection / _readConnection / _transaction (o Dapper abre e fecha a conexão a cada comando); ExecuteSafeAsync fica para chamadas paralelas, comandos na mesma sessão e leituras não bufferizadas.
+      • Corrigidos: NullReferenceException em entidade sem [Description]; InsertAsync retornando Guid.Empty (agora usa RETURNING); SQL inválido sem SchemaBD; GetById/GetAll fora da transação.
+      • Metadados e SQL gerados uma única vez por entidade (cache).
+      • Removidos IPostgresDbConnection/PostgresDbConnection, AddDapperPostgres e IDisposable dos repositórios.
+    </PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.1.66" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.7" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.7" />
     <PackageReference Include="Npgsql" Version="9.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Marraia.Postgres.Tests" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,6 +47,7 @@
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>
