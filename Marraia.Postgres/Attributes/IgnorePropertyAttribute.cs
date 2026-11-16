@@ -2,8 +2,10 @@
 
 namespace Marraia.Postgres.Attributes
 {
-    [AttributeUsage(AttributeTargets.Property |
-                        AttributeTargets.Struct)]
+    /// <summary>
+    /// Marca uma propriedade que não deve ser persistida pelos comandos gerados (INSERT/UPDATE).
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Property)]
     public class IgnorePropertyAttribute : Attribute
     {
     }
